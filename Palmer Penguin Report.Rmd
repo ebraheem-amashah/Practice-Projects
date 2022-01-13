@@ -1,0 +1,71 @@
+---
+title: "Palmer Penguins Report"
+author: "Ebraheem Amashah"
+date: "1/12/2022"
+output: pdf_document
+---
+
+## Setting up my environment 
+Notes: Setting up the R environment by loading "tidyverse" and "palmerpenguins" packages
+```{r loading packages}
+library(tidyverse)
+library(palmerpenguins)
+
+```
+
+### Exploratory Analysis
+Notes: I find it helpful to go through column names and some values before manipulating the data. I find this saves me a lot of time and confusion down the line.
+
+```{r exploratory analysis}
+colnames(penguins)
+head(penguins)
+```
+
+
+### Visualization
+Notes: I decided to examine the relationship between *body mass* and *flipper length* across the different *species*. We have some null values in the *sex* column that we can get rid of.
+
+```{r species}
+penguins %>%
+  drop_na(sex) %>% 
+  ggplot(mapping = aes(x = flipper_length_mm, y = body_mass_g,
+  color = species, shape = species))+
+  geom_point() + facet_wrap(~species) + 
+  labs(title = "Flipper Lengths & Body Mass Across Species", x =  "Flipper Length (mm)", y = "Body Mass (g)", caption = "Data from 2007") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Next, I decided to explore the impact of adding *sex* in the equation. It could be insightful to make comparisons across different sexes along with *species*.
+
+```{r species and sex}
+
+
+penguins %>% 
+  drop_na(sex) %>% 
+  ggplot(mapping = aes(x= flipper_length_mm, y = body_mass_g, 
+  color = species, shape = sex))+
+  geom_point() + facet_grid(sex~species) + 
+  labs(title = "Flipper Lengths & Body Mass Across Sex & Species",
+  x = "Flipper Length (mm)", y = "Body Mass (g)", caption = "Data from 2007") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+### Observations and Findings
+
+So far we can see that the male Gentoo penguins are the largest, both in terms of body mass and flipper lengths and the Adelie species in the smallest. We can use a quick statistical analysis code to confirm.
+```{r stat summary}
+
+penguins %>% 
+  drop_na() %>% 
+  group_by(species) %>% 
+  summarize(mean_body_mass = mean(body_mass_g), 
+  mean_flipper_length = mean(flipper_length_mm))
+```
+
+We can now be assured our initial observations are correct. The largest *species* by both *flipper length* and *body mass* is the Gentoos and the smallest *species* are the Adelie penguins. but is it safe to assume a positive correlation between *body mass* and *flipper length*?
+
+```{r}
+ggplot(data = penguins) + geom_smooth(mapping = aes(x = flipper_length_mm, y = body_mass_g, line_type = species, color = species)) + labs(title = "Body Mass & Flipper Length", x = "Flipper Length (mm)", y ="Body Mass (g)", caption = "Data from 2007" )
+```
+
+This graph clear shows the positive relationship between *body mass* and *flipper length* present across all species.
