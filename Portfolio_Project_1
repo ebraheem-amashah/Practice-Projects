@@ -1,18 +1,24 @@
 /*
-Bike-Share Data Exploration, Processing and Analysis
-Skills used: Sub-Queries, Unions, Aggregate Functions, Creating Views, Converting Data Types
+Bike-Share Data Exploration, Processing, and Analysis
+Skills used: CASE Statements, Sub-Queries,  Unions, Aggregate Functions, Creating Tables, Creating Views, Converting Data Types
 */
 
--- Business Task: explore differences between casual memebers and annual members in 12 months worth of data from bike-sharing company.
--- Goal: design a marketing campain targeting casual riders to increase annual memberships.
--- Process: Clean monthly datafor exploration and analysis. I decided to combine the data into one table 
--- to be able to observe/compare trends between month to spot any seasonality.
+-- Business Task: Explore differences between casual memebers and annual members in 12 months worth of data from bike-sharing company.
+-- Goal: Design a marketing campain targeting casual riders to increase annual memberships.
+-- Process: Clean monthly data for exploration and analysis. I decided to combine the data into one table 
+-- 
 
 
 -- I first exported the data into excel to take a look and to understand the contact and structure of the data.
--- For our business task, I deciedd to leave behind the start_long, start_lat, end_lon, and end_lat columns because they are irrelevant to the busienss task.
+-- For our business task, I decided to leave behind the start_long, start_lat, end_lon, and end_lat columns, which have to do with
+-- the geographical coordinates of bike docking stations, because they 
+-- are irrelevant to the busienss task.
 
---Data cleaning and merging 
+------------------------------------------------------------------------------------------
+-- I began by merging my monthly ride data into a single table to be able to observe trends between months to spot seasonality.
+-- I wrote a query that aggregates all data with no NULL values into a new table. 
+-- This allowed me preserve the raw data in its orginial form, create my new table, and produce clean data for analysis in one step.
+
 
 CREATE TABLE `case-study-space.cyclist_ridership.annual_trips_clean`
 AS
@@ -78,7 +84,9 @@ AND end_station_name IS NOT NULL
 AND end_station_id IS NOT NULL 
 AND member_casual IS NOT NULL
 
--- Notes: I used UNION ALL to allow duplicate values which exist in the data start_station_name to exist in the new table. Some columns however, e.x. ride_id --should not have any duplicates. To inspect this, I ran the following query.
+-------------------------------------------------------------------------------
+-- In the previous query,I used UNION ALL to allow duplicate values which exist in the data start_station_name to exist in the new table. 
+-- Some columns however, e.x. ride_id --should not have any duplicates. To inspect this, I ran the following query.
 
 SELECT 
     DISTINCT COUNT (ride_id),
@@ -87,8 +95,8 @@ FROM
     `case-study-space.cyclist_ridership.annual_trips_clean`
 
  
-
--- Now that the data is clean and ready for analysis, I decided to examine the different ways riders can differ in their utilization of the service. 
+------------------------------------------------------------------------------------
+-- Now that the data is clean and ready for analysis, I could examine the different ways riders can differ in their utilization of the service. 
 -- Knowing that the company offers multiple bike types, I decided to start there. 
 -- The purpose of the  next query is to group the bike type 'rideable_type' and the membership status 'member_casual' to spot any trends.
 -- I used a case statement to calculate what percentage each readable_type and member_casual represent out of the large members and casual groups.
@@ -112,6 +120,7 @@ GROUP BY
     rideable_type, member_casual
 ORDER BY count DESC
 
+------------------------------------------------------------------------------------
 
 -- Another angle I decided to examine is seasnality, I wanted to write a query that highlight rank the number of member and casual riders each month.
 -- The DATE variable, listed in the started_at and ended_at columns are DATETIME format, so I wrote a query to extract the month element to group the results.
@@ -128,6 +137,7 @@ group by member_casual, month
 order by percentage_of_total_rides DESC
 
 
+------------------------------------------------------------------------------------
 
 -- Another angle I considered is the location. I wrote a query to examine if casual riders habitually use different locations from the member riders.
 
@@ -139,6 +149,8 @@ from`case-study-space.cyclist_ridership.annual_trips_clean`
 Group by start_station_name, member_casual
 order by num_of_rides DESC
 
+
+------------------------------------------------------------------------------------
 
 -- Lastly, I decided to query the most popular locations for casual riders. This is valueable information as these locations would be the prime targets for 
 -- our marketing campaign.
@@ -152,5 +164,7 @@ WHERE member_casual = "casual"
 Group by start_station_name, member_casual
 order by num_of_rides DESC
 
---Now that I have some strng insights, I downloaded the results of my queries to build out my vizualizations.
+------------------------------------------------------------------------------------
+
+-- Now that I have some strng insights, I downloaded the results of my queries to build out my vizualizations.
 
