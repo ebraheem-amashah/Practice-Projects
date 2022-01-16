@@ -1,5 +1,7 @@
-- 👋 Hi, I’m @ebraheem-amashah
+# 👋 Hi, I’m Ebraheem Amashah, Welcome to my Portfolio Repository
+##### A little about me:
 - 👀 I’m interested in Data Analytics
+- 💼 My favorite tools are SQL, R, and Excel
 - 📫 Reach me @eamashah19@gmail.com
 
 <!---
