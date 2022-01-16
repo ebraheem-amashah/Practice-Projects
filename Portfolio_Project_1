@@ -1,7 +1,6 @@
 /*
-Title: Data Exploration and Cleaning in SQL 
-Author: Ebraheem Amashah
-Part of the Google Data Analytics Cap Stone Project
+Bike-Share Data Exploration, Processing and Analysis
+Skills used: Sub-Queries, Unions, Aggregate Functions, Creating Views, Converting Data Types
 */
 
 -- Business Task: explore differences between casual memebers and annual members in 12 months worth of data from bike-sharing company.
