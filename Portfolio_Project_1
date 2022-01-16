@@ -1,0 +1,157 @@
+/*
+Title: Data Exploration and Cleaning in SQL 
+Author: Ebraheem Amashah
+Part of the Google Data Analytics Cap Stone Project
+*/
+
+-- Business Task: explore differences between casual memebers and annual members in 12 months worth of data from bike-sharing company.
+-- Goal: design a marketing campain targeting casual riders to increase annual memberships.
+-- Process: Clean monthly datafor exploration and analysis. I decided to combine the data into one table 
+-- to be able to observe/compare trends between month to spot any seasonality.
+
+
+-- I first exported the data into excel to take a look and to understand the contact and structure of the data.
+-- For our business task, I deciedd to leave behind the start_long, start_lat, end_lon, and end_lat columns because they are irrelevant to the busienss task.
+
+--Data cleaning and merging 
+
+CREATE TABLE `case-study-space.cyclist_ridership.annual_trips_clean`
+AS
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+
+FROM(
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_01_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_02_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_03_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_04_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_05_trips.`
+
+UNION ALL 
+SELECT ride_id,rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_06_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_07_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_08_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_09_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_10_trips.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_11.`
+
+UNION ALL 
+SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual
+from `case-study-space.cyclist_ridership.2021_12_trips.`
+)
+
+WHERE 
+ride_id IS NOT NULL 
+AND rideable_type IS NOT NULL
+AND started_at IS NOT NULL 
+AND ended_at IS NOT NULL 
+AND start_station_name IS NOT NULL 
+AND start_station_id IS NOT NULL 
+AND end_station_name IS NOT NULL
+AND end_station_id IS NOT NULL 
+AND member_casual IS NOT NULL
+
+-- Notes: I used UNION ALL to allow duplicate values which exist in the data start_station_name to exist in the new table. Some columns however, e.x. ride_id --should not have any duplicates. To inspect this, I ran the following query.
+
+SELECT 
+    DISTINCT COUNT (ride_id),
+    COUNT (ride_id)
+FROM
+    `case-study-space.cyclist_ridership.annual_trips_clean`
+
+ 
+
+-- Now that the data is clean and ready for analysis, I decided to examine the different ways riders can differ in their utilization of the service. 
+-- Knowing that the company offers multiple bike types, I decided to start there. 
+-- The purpose of the  next query is to group the bike type 'rideable_type' and the membership status 'member_casual' to spot any trends.
+-- I used a case statement to calculate what percentage each readable_type and member_casual represent out of the large members and casual groups.
+
+SELECT 
+    rideable_type,
+    COUNT (rideable_type) AS count,
+    member_casual AS membership_status,
+    
+    CASE WHEN (member_casual = "casual") THEN (ROUND((count(rideable_type) / (select count(member_casual)
+                            from `case-study-space.cyclist_ridership.annual_trips_clean`
+                            where member_casual = "casual") *100) ,2) )
+    
+   
+   ELSE (ROUND(( count(rideable_type) / (select count(member_casual)
+                            from `case-study-space.cyclist_ridership.annual_trips_clean`
+                            where member_casual = "member") * 100 ), 2) ) END AS percentage
+
+FROM `case-study-space.cyclist_ridership.annual_trips_clean`
+GROUP BY 
+    rideable_type, member_casual
+ORDER BY count DESC
+
+
+-- Another angle I decided to examine is seasnality, I wanted to write a query that highlight rank the number of member and casual riders each month.
+-- The DATE variable, listed in the started_at and ended_at columns are DATETIME format, so I wrote a query to extract the month element to group the results.
+
+SELECT 
+count(ride_id) AS num_of_rides,
+member_casual AS membership_status,
+EXTRACT(MONTH FROM ended_at) AS month,
+Round((count(ride_id) / ( select count(ride_id) FROM`case-study-space.cyclist_ridership.annual_trips_clean` )) * 100,2) AS percentage_of_total_rides,
+
+
+FROM `case-study-space.cyclist_ridership.annual_trips_clean`
+group by member_casual, month
+order by percentage_of_total_rides DESC
+
+
+
+-- Another angle I considered is the location. I wrote a query to examine if casual riders habitually use different locations from the member riders.
+
+SELECT 
+    start_station_name,
+    count(start_station_name) AS num_of_rides,
+    member_casual
+from`case-study-space.cyclist_ridership.annual_trips_clean`
+Group by start_station_name, member_casual
+order by num_of_rides DESC
+
+
+-- Lastly, I decided to query the most popular locations for casual riders. This is valueable information as these locations would be the prime targets for 
+-- our marketing campaign.
+
+SELECT 
+    start_station_name,
+    count(start_station_name) AS num_of_rides,
+    member_casual
+from`case-study-space.cyclist_ridership.annual_trips_clean`
+WHERE member_casual = "casual"
+Group by start_station_name, member_casual
+order by num_of_rides DESC
+
+--Now that I have some strng insights, I downloaded the results of my queries to build out my vizualizations.
+
