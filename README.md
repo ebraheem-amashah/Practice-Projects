@@ -3,7 +3,7 @@
 - 👀 I’m interested in Data Analytics
 - 💼 My favorite tools are SQL, R, and Excel
 - 📫 Reach me @eamashah19@gmail.com
-- 🌐 Checkout my webpage portfolio [here](ebraheemamashah.com)
+- 🌐 Copy www.ebraheemamashah.com into your browsers to view my portfolio website
 
 <!---
 ebraheem-amashah/ebraheem-amashah is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
