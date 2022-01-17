@@ -99,7 +99,7 @@ FROM
 -- Now that the data is clean and ready for analysis, I could examine the different ways riders can differ in their utilization of the service. 
 -- Knowing that the company offers multiple bike types, I decided to start there. 
 -- The purpose of the  next query is to group the bike type 'rideable_type' and the membership status 'member_casual' to spot any trends.
--- I used a case statement to calculate what percentage each readable_type and member_casual represent out of the large members and casual groups.
+-- I used a case statement to calculate what percentage each rideable_type and member_casual represent out of the large members and casual groups.
 
 SELECT 
     rideable_type,
@@ -119,6 +119,27 @@ FROM `case-study-space.cyclist_ridership.annual_trips_clean`
 GROUP BY 
     rideable_type, member_casual
 ORDER BY count DESC
+
+
+
+-- NOTES: After running above query, I noticed that over 15% of casual riders prefer the docked_bike type, whereas almost 0 annual members use this type of bike.
+-- I decided to look for where these bikes are being used. This information will allow the company to target these users in their marketing campaign.
+-- This following query will give me the top 15 locations where casual riders are going for their docked bikes, an advertisment placed at any one of these locations will certainly reach the target audience.
+
+SELECT 
+    COUNT(ride_id) AS num_of_rides,
+    start_station_name,
+
+
+FROM `case-study-space.cyclist_ridership.annual_trips_clean`
+
+WHERE member_casual = 'casual' 
+    AND rideable_type = 'docked_bike'
+
+GROUP BY  start_station_name
+ORDER BY count(ride_id) DESC
+
+LIMIT 15
 
 ------------------------------------------------------------------------------------
 
